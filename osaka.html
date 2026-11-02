@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大阪 5 天 4 夜繪本之旅 🏯✨</title>
+  <title>大阪 5 天 4 夜之旅 🏯✨</title>
   
   <!-- Google Fonts: 粉圓體 (Huninn) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -134,6 +134,20 @@
       border-radius: 4px;
     }
 
+    /* 列印與 PDF 匯出優化 */
+    @media print {
+      nav, .fixed, button, input, select, .no-print {
+        display: none !important;
+      }
+      body {
+        padding-bottom: 0 !important;
+        background-color: #FFFFFF !important;
+      }
+      .pb-border, .pb-border-sm {
+        box-shadow: none !important;
+      }
+    }
+
     /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 8px;
@@ -156,9 +170,14 @@
     <div class="max-w-md mx-auto flex justify-between items-center">
       <a href="#home" class="flex items-center gap-2 font-black text-lg text-ink">
         <span class="bg-coral text-white p-1 px-2 rounded-xl border-2 border-ink text-xs">2027</span>
-        <span contenteditable="true">大阪繪本小旅行</span>
+        <span contenteditable="true">大阪旅行</span>
       </a>
-      <span class="text-xs font-bold bg-yamabuki px-2 py-1 rounded-full border-2 border-ink"><i class="fa-solid fa-pen text-[10px] mr-1"></i>點文字即可編輯</span>
+      <div class="flex items-center gap-2">
+        <button onclick="exportToPDF()" class="text-xs font-black bg-coral text-white px-2.5 py-1 rounded-full border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-file-pdf"></i> PDF
+        </button>
+        <span class="text-[10px] font-bold bg-yamabuki px-2 py-1 rounded-full border-2 border-ink"><i class="fa-solid fa-pen mr-0.5"></i>可編輯</span>
+      </div>
     </div>
   </nav>
 
@@ -274,7 +293,7 @@
           <span class="w-4 h-8 bg-mizuiro rounded-full border-2 border-ink"></span>
           <h2 class="text-xl font-black text-ink" contenteditable="true">住宿飯店</h2>
         </div>
-        <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Hankyu+RESPIRE+OSAKA" target="_blank" class="text-xs font-black bg-yamabuki px-3 py-1.5 rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 flex items-center gap-1">
+        <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Hankyu+RESPIRE+OSAKA" target="_blank" class="text-xs font-black bg-yamabuki px-3 py-1.5 rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 flex items-center gap-1 no-print">
           <i class="fa-solid fa-location-dot text-coral"></i> 地圖
         </a>
       </div>
@@ -299,11 +318,13 @@
           <span class="w-4 h-8 bg-yamabuki rounded-full border-2 border-ink"></span>
           <h2 class="text-xl font-black text-ink" contenteditable="true">每日行程</h2>
         </div>
-        <span class="text-xs font-bold bg-sand px-2.5 py-1 rounded-full border-2 border-ink">點擊日期切換</span>
+        <div class="flex items-center gap-2 no-print">
+          <button onclick="renderAllDaysForPDF()" class="text-xs font-black bg-mizuiro px-2.5 py-1 rounded-full border-2 border-ink cursor-pointer">展開全部日</button>
+        </div>
       </div>
 
       <!-- 日期分頁按鈕 (5天) -->
-      <div class="grid grid-cols-5 gap-1.5" id="day-tabs">
+      <div class="grid grid-cols-5 gap-1.5 no-print" id="day-tabs">
         <button onclick="switchDay(1)" id="tab-d1" class="day-tab active pb-border-sm py-2 px-1 text-center bg-paper cursor-pointer transition-all">
           <p class="text-[10px] font-black opacity-70">1/13</p>
           <p class="text-xs font-black">D1</p>
@@ -348,13 +369,13 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-4 h-8 bg-coral rounded-full border-2 border-ink"></span>
-          <h2 class="text-xl font-black text-ink">旅程分帳記帳</h2>
+          <h2 class="text-xl font-black text-ink">旅程記帳</h2>
         </div>
         <span class="text-xs font-black bg-sand px-2.5 py-1 rounded-full border-2 border-ink">即時統計</span>
       </div>
 
       <!-- 記帳表單 -->
-      <div class="bg-paper p-5 pb-border shadow-picture-book space-y-3">
+      <div class="bg-paper p-5 pb-border shadow-picture-book space-y-3 no-print">
         <h3 class="font-black text-sm text-ink flex items-center gap-2">
           <i class="fa-solid fa-pen-to-square text-coral"></i> 新增消費紀錄
         </h3>
@@ -374,11 +395,11 @@
           <div>
             <label class="block text-ink/70 mb-1">消費類別</label>
             <select id="exp-cat" class="w-full p-2 bg-sand rounded-xl border-2 border-ink outline-none">
-              <option value="餐饮美食">🍜 餐飲美食</option>
-              <option value="交通票券">🚃 交通票券</option>
-              <option value="購物買物">🛍️ 購物買物</option>
-              <option value="景點門票">🎟️ 景點門票</option>
-              <option value="其他雜項">🎈 其他雜項</option>
+              <option value="🍜 餐飲美食">🍜 餐飲美食</option>
+              <option value="🚃 交通票券">🚃 交通票券</option>
+              <option value="🛍️ 購物買物">🛍️ 購物買物</option>
+              <option value="🎟️ 景點門票">🎟️ 景點門票</option>
+              <option value="🎈 其他雜項">🎈 其他雜項</option>
             </select>
           </div>
 
@@ -388,7 +409,7 @@
           </div>
 
           <div>
-            <label class="block text-ink/70 mb-1">金額 (NTD / JPY)</label>
+            <label class="block text-ink/70 mb-1">金額 (JPY/NTD)</label>
             <input type="number" id="exp-amount" placeholder="1000" class="w-full p-2 bg-sand rounded-xl border-2 border-ink outline-none">
           </div>
         </div>
@@ -401,7 +422,7 @@
       <!-- 每日花費總額統計 -->
       <div class="bg-sand p-4 rounded-2xl pb-border-sm shadow-picture-book-sm space-y-2">
         <h3 class="font-black text-xs text-ink/80 flex items-center justify-between border-b border-ink/20 pb-1">
-          <span>📅 每日花費總額匯總</span>
+          <span>📅 每日花費總額</span>
           <span class="text-coral font-black" id="exp-grand-total">總計: 0</span>
         </h3>
         <div id="daily-expense-totals" class="grid grid-cols-2 gap-2 text-xs font-black">
@@ -430,7 +451,7 @@
 
       <div class="bg-paper p-5 pb-border shadow-picture-book space-y-3">
         <!-- 新增採購品項 -->
-        <div class="flex gap-2">
+        <div class="flex gap-2 no-print">
           <input type="text" id="shop-input" placeholder="輸入想買的藥妝/伴手禮..." class="flex-1 p-2 text-xs font-bold bg-sand rounded-xl border-2 border-ink outline-none">
           <button onclick="addShoppingItem()" class="px-4 bg-coral text-white font-black text-xs rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 cursor-pointer">
             加入
@@ -444,7 +465,7 @@
       </div>
     </section>
 
-    <!-- 攜帶物品清單區塊 -->
+    <!-- 攜帶物品清單區塊 (可自行增減項目) -->
     <section id="packing" class="space-y-3 pt-2">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -456,10 +477,21 @@
 
       <!-- 隨身行李 -->
       <div class="bg-paper p-5 pb-border shadow-picture-book space-y-3">
-        <div class="flex items-center gap-2 text-coral border-b-2 border-ink/20 pb-2">
-          <i class="fa-solid fa-bag-shopping font-black"></i>
-          <h3 class="font-black text-sm text-ink" contenteditable="true">隨身背包 / 登機包</h3>
+        <div class="flex items-center justify-between border-b-2 border-ink/20 pb-2">
+          <div class="flex items-center gap-2 text-coral">
+            <i class="fa-solid fa-bag-shopping font-black"></i>
+            <h3 class="font-black text-sm text-ink" contenteditable="true">隨身背包 / 登機包</h3>
+          </div>
         </div>
+
+        <!-- 新增隨身行李輸入框 -->
+        <div class="flex gap-2 no-print mb-2">
+          <input type="text" id="carry-input" placeholder="新增隨身物品..." class="flex-1 p-2 text-xs font-bold bg-sand rounded-xl border-2 border-ink outline-none">
+          <button onclick="addPackingItem('carry')" class="px-3 bg-yamabuki text-ink font-black text-xs rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 cursor-pointer">
+            ＋ 新增
+          </button>
+        </div>
+
         <div class="grid grid-cols-2 gap-2 text-xs font-bold" id="carryon-list">
           <!-- JS 渲染 -->
         </div>
@@ -467,17 +499,28 @@
 
       <!-- 托運行李 -->
       <div class="bg-paper p-5 pb-border shadow-picture-book space-y-3">
-        <div class="flex items-center gap-2 text-mizuiro border-b-2 border-ink/20 pb-2">
-          <i class="fa-solid fa-suitcase-rolling font-black text-ink"></i>
-          <h3 class="font-black text-sm text-ink" contenteditable="true">托運行李箱</h3>
+        <div class="flex items-center justify-between border-b-2 border-ink/20 pb-2">
+          <div class="flex items-center gap-2 text-mizuiro">
+            <i class="fa-solid fa-suitcase-rolling font-black text-ink"></i>
+            <h3 class="font-black text-sm text-ink" contenteditable="true">托運行李箱</h3>
+          </div>
         </div>
+
+        <!-- 新增托運行李輸入框 -->
+        <div class="flex gap-2 no-print mb-2">
+          <input type="text" id="checked-input" placeholder="新增託運行李物品..." class="flex-1 p-2 text-xs font-bold bg-sand rounded-xl border-2 border-ink outline-none">
+          <button onclick="addPackingItem('checked')" class="px-3 bg-mizuiro text-ink font-black text-xs rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 cursor-pointer">
+            ＋ 新增
+          </button>
+        </div>
+
         <div class="grid grid-cols-1 gap-2 text-xs font-bold" id="checked-list">
           <!-- JS 渲染 -->
         </div>
       </div>
     </section>
 
-    <!-- 行程費用預算區塊 -->
+    <!-- 行程費用預算區塊 (自動計算加總 + 增減細項) -->
     <section id="budget" class="space-y-3 pt-2">
       <div class="flex items-center gap-2">
         <span class="w-4 h-8 bg-coral rounded-full border-2 border-ink"></span>
@@ -485,32 +528,36 @@
       </div>
 
       <div class="bg-paper p-5 pb-border shadow-picture-book space-y-4">
-        <!-- 總計金額 -->
+        <!-- 總計金額 (自動加計) -->
         <div class="bg-sand p-4 rounded-2xl border-2 border-ink flex justify-between items-center">
           <div>
-            <p class="text-xs font-bold text-ink/70" contenteditable="true">預估每人費用總計</p>
-            <p class="text-2xl font-black text-coral" id="total-cost">NT$ --</p>
+            <p class="text-xs font-bold text-ink/70" contenteditable="true">預估每人費用總計 (自動加總)</p>
+            <p class="text-2xl font-black text-coral" id="total-cost">NT$ 0</p>
           </div>
           <div class="w-12 h-12 rounded-full bg-yamabuki border-2 border-ink flex items-center justify-center text-xl">
             💰
           </div>
         </div>
 
-        <!-- 費用明細 -->
+        <!-- 新增預算項目表單 -->
+        <div class="grid grid-cols-3 gap-2 no-print">
+          <input type="text" id="bud-name" placeholder="項目名稱" class="p-2 text-xs font-bold bg-sand rounded-xl border-2 border-ink outline-none">
+          <input type="number" id="bud-cost" placeholder="金額 NT$" class="p-2 text-xs font-bold bg-sand rounded-xl border-2 border-ink outline-none">
+          <button onclick="addBudgetItem()" class="bg-wakatake text-ink font-black text-xs rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 cursor-pointer">
+            ＋ 新增細項
+          </button>
+        </div>
+
+        <!-- 費用明細清單 -->
         <div class="space-y-2 text-xs font-bold" id="budget-items">
           <!-- JS 渲染 -->
         </div>
-
-        <p class="text-[10px] text-ink/60 text-center font-bold pt-2 border-t-2 border-dashed border-ink/20" contenteditable="true">
-          💡 票券明細：票券+行程 (16,184 = 1,689 + 9,500 + 2,010 + 2,985)
-        </p>
-      </div>
     </section>
 
   </main>
 
   <!-- 底部固定選單 (釘選功能列: 行程、地圖、首頁、記帳、行李) -->
-  <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#FFFCF6] border-t-4 border-[#3E3A39] py-2 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+  <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#FFFCF6] border-t-4 border-[#3E3A39] py-2 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] no-print">
     <div class="max-w-md mx-auto flex justify-around items-center">
       <a href="#itinerary" class="flex flex-col items-center text-ink hover:text-coral transition-colors">
         <div class="w-9 h-9 rounded-2xl bg-yamabuki border-2 border-ink flex items-center justify-center shadow-picture-book-sm active:translate-y-0.5">
@@ -552,7 +599,7 @@
   <!-- 底部手繪頁尾 -->
   <footer class="mt-8 text-center text-xs font-bold text-ink/60 space-y-1">
     <p contenteditable="true">Have a nice trip in Osaka! 🇯🇵✨</p>
-    <p class="text-[10px]" contenteditable="true">繪本風旅遊手冊 ‧ 2027</p>
+    <p class="text-[10px]" contenteditable="true">大阪旅遊手冊 ‧ 2027</p>
   </footer>
 
   <script>
@@ -580,7 +627,7 @@
     updateCountdown();
     setInterval(updateCountdown, 60000);
 
-    // 2. 每日行程資料集 (包含 Google Map 搜尋連結)
+    // 2. 每日行程資料集
     const itineraryData = {
       1: {
         date: "2027.01.13 (三)",
@@ -653,13 +700,9 @@
     function switchDay(dayNum) {
       document.querySelectorAll('.day-tab').forEach(tab => tab.classList.remove('active'));
       const activeTab = document.getElementById(`tab-d${dayNum}`);
-      activeTab.classList.add('active');
-      
-      activeTab.classList.add('tab-bounce');
-      setTimeout(() => activeTab.classList.remove('tab-bounce'), 300);
+      if(activeTab) activeTab.classList.add('active');
 
       const data = itineraryData[dayNum];
-
       document.getElementById('day-date-badge').innerText = data.date;
       document.getElementById('day-title').innerText = data.title;
       document.getElementById('day-svg').innerText = data.icon;
@@ -669,15 +712,15 @@
       container.innerHTML = '';
 
       data.events.forEach((item, index) => {
-        const mustBadge = item.must ? `<span class="bg-coral text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-ink ml-1 animate-pulse" contenteditable="true">必去</span>` : '';
+        const mustBadge = item.must ? `<span class="bg-coral text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-ink ml-1" contenteditable="true">必去</span>` : '';
         const navBtn = item.map ? `
-          <a href="https://www.google.com/maps/search/?api=1&query=${item.map}" target="_blank" class="text-[10px] font-black bg-yamabuki px-2 py-0.5 rounded-md border border-ink shadow-picture-book-sm active:translate-y-0.5 flex items-center gap-1">
+          <a href="https://www.google.com/maps/search/?api=1&query=${item.map}" target="_blank" class="text-[10px] font-black bg-yamabuki px-2 py-0.5 rounded-md border border-ink shadow-picture-book-sm flex items-center gap-1 no-print">
             <i class="fa-solid fa-location-dot text-coral"></i> 導航
           </a>
         ` : '';
 
         const html = `
-          <div class="relative bg-paper p-4 pb-border-sm shadow-picture-book-sm space-y-1 transform transition-all hover:-translate-y-0.5">
+          <div class="relative bg-paper p-4 pb-border-sm shadow-picture-book-sm space-y-1">
             <div class="absolute -left-[27px] top-4 w-5 h-5 rounded-full bg-yamabuki border-2 border-ink flex items-center justify-center text-[10px] font-black">
               ${index + 1}
             </div>
@@ -701,9 +744,42 @@
       });
     }
 
-    // 3. 行李待辦清單 (LocalStorage 保存狀態)
-    const carryOnItems = ["現金", "信用卡", "護照", "eSIM", "日幣", "頸枕", "行充", "耳機", "髮圈", "VSJ"];
-    const checkedItems = [
+    // 列印/匯出 PDF 時展開 5 天行程
+    function renderAllDaysForPDF() {
+      const container = document.getElementById('timeline-container');
+      container.innerHTML = '';
+      document.getElementById('day-header').className = "bg-yamabuki p-4 pb-border shadow-picture-book text-center";
+      document.getElementById('day-header').innerHTML = `<h3 class="text-lg font-black text-ink">🗓️ 大阪 5 天 4 夜完整行程表</h3>`;
+
+      Object.keys(itineraryData).forEach((dayNum) => {
+        const data = itineraryData[dayNum];
+        container.insertAdjacentHTML('beforeend', `
+          <div class="my-3 font-black text-sm bg-sand p-2 rounded-xl border-2 border-ink">${data.date} - ${data.title}</div>
+        `);
+        data.events.forEach((item, index) => {
+          container.insertAdjacentHTML('beforeend', `
+            <div class="relative bg-paper p-3 pb-border-sm space-y-1 mb-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black">${item.time} (${item.type})</span>
+                <span class="font-black text-sm">${item.title}</span>
+              </div>
+              <p class="text-xs font-bold text-ink/70">${item.desc}</p>
+            </div>
+          `);
+        });
+      });
+    }
+
+    function exportToPDF() {
+      renderAllDaysForPDF();
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    }
+
+    // 3. 行李整理清單 (支援自訂增減項目 + 本地儲存)
+    const defaultCarryItems = ["現金", "信用卡", "護照", "eSIM", "日幣", "頸枕", "行充", "耳機", "髮圈", "VSJ"];
+    const defaultCheckedItems = [
       "衛生紙、卸妝巾/水、棉花棒",
       "搓澡巾、鯊魚夾、牙刷、毛巾",
       "隱眼用品、眼鏡、墨鏡",
@@ -713,7 +789,10 @@
       "藥品、磨刀、充電線、手錶充電、飾品"
     ];
 
-    let packingStatus = JSON.parse(localStorage.getItem('osaka_packing_status')) || {};
+    let packingItems = JSON.parse(localStorage.getItem('osaka_packing_items')) || {
+      carry: defaultCarryItems.map((text, id) => ({ id: 'c_' + id, name: text, checked: false })),
+      checked: defaultCheckedItems.map((text, id) => ({ id: 'k_' + id, name: text, checked: false }))
+    };
 
     function renderPackingList() {
       const carryContainer = document.getElementById('carryon-list');
@@ -722,76 +801,138 @@
       carryContainer.innerHTML = '';
       checkedContainer.innerHTML = '';
 
-      let totalCount = carryOnItems.length + checkedItems.length;
+      let totalCount = packingItems.carry.length + packingItems.checked.length;
       let checkedCount = 0;
 
-      carryOnItems.forEach((item, idx) => {
-        const key = `c_${idx}`;
-        const isChecked = packingStatus[key] || false;
-        if (isChecked) checkedCount++;
-
+      packingItems.carry.forEach((item) => {
+        if (item.checked) checkedCount++;
         carryContainer.insertAdjacentHTML('beforeend', `
-          <label class="flex items-center gap-2 p-2 rounded-xl bg-sand/60 border border-ink/20 cursor-pointer">
-            <input type="checkbox" class="custom-checkbox" onchange="togglePack('${key}')" ${isChecked ? 'checked' : ''}>
-            <span class="${isChecked ? 'line-through opacity-50' : ''}" contenteditable="true">${item}</span>
-          </label>
+          <div class="flex items-center justify-between p-2 rounded-xl bg-sand/60 border border-ink/20">
+            <label class="flex items-center gap-2 flex-1 cursor-pointer">
+              <input type="checkbox" class="custom-checkbox" onchange="togglePackItem('carry', '${item.id}')" ${item.checked ? 'checked' : ''}>
+              <span class="${item.checked ? 'line-through opacity-50' : ''}" contenteditable="true">${item.name}</span>
+            </label>
+            <button onclick="deletePackingItem('carry', '${item.id}')" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs no-print">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
         `);
       });
 
-      checkedItems.forEach((item, idx) => {
-        const key = `k_${idx}`;
-        const isChecked = packingStatus[key] || false;
-        if (isChecked) checkedCount++;
-
+      packingItems.checked.forEach((item) => {
+        if (item.checked) checkedCount++;
         checkedContainer.insertAdjacentHTML('beforeend', `
-          <label class="flex items-start gap-2 p-2 rounded-xl bg-sand/60 border border-ink/20 cursor-pointer">
-            <input type="checkbox" class="custom-checkbox mt-0.5" onchange="togglePack('${key}')" ${isChecked ? 'checked' : ''}>
-            <span class="${isChecked ? 'line-through opacity-50' : ''}" contenteditable="true">${item}</span>
-          </label>
+          <div class="flex items-center justify-between p-2 rounded-xl bg-sand/60 border border-ink/20">
+            <label class="flex items-start gap-2 flex-1 cursor-pointer">
+              <input type="checkbox" class="custom-checkbox mt-0.5" onchange="togglePackItem('checked', '${item.id}')" ${item.checked ? 'checked' : ''}>
+              <span class="${item.checked ? 'line-through opacity-50' : ''}" contenteditable="true">${item.name}</span>
+            </label>
+            <button onclick="deletePackingItem('checked', '${item.id}')" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs no-print ml-2">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
         `);
       });
 
       document.getElementById('packing-progress').innerText = `${checkedCount}/${totalCount} 完成`;
     }
 
-    function togglePack(key) {
-      packingStatus[key] = !packingStatus[key];
-      localStorage.setItem('osaka_packing_status', JSON.stringify(packingStatus));
+    function addPackingItem(type) {
+      const inputId = type === 'carry' ? 'carry-input' : 'checked-input';
+      const input = document.getElementById(inputId);
+      const text = input.value.trim();
+      if (!text) return;
+
+      packingItems[type].push({
+        id: type + '_' + Date.now(),
+        name: text,
+        checked: false
+      });
+
+      localStorage.setItem('osaka_packing_items', JSON.stringify(packingItems));
+      input.value = '';
       renderPackingList();
     }
 
-    // 4. 費用預算固定明細
-    const budgetData = [
-      { name: "機票 (台灣虎航)", cost: 13000, cat: "交通" },
-      { name: "住宿 (大阪龍仕柏 4 晚)", cost: 8000, cat: "住宿" },
-      { name: "預換日幣現金", cost: 5000, cat: "現金" },
-      { name: "eSIM 上網卡", cost: 300, cat: "網卡" },
-      { name: "機場接送 + 機捷", cost: 500, cat: "交通" },
-      { name: "旅遊平安險", cost: 300, cat: "保險" },
-      { name: "票券、行程套票", cost: 16184, cat: "票券" }
+    function togglePackItem(type, id) {
+      packingItems[type] = packingItems[type].map(item => item.id === id ? { ...item, checked: !item.checked } : item);
+      localStorage.setItem('osaka_packing_items', JSON.stringify(packingItems));
+      renderPackingList();
+    }
+
+    function deletePackingItem(type, id) {
+      packingItems[type] = packingItems[type].filter(item => item.id !== id);
+      localStorage.setItem('osaka_packing_items', JSON.stringify(packingItems));
+      renderPackingList();
+    }
+
+    // 4. 行程費用預算 (自動加總計 + 可動態新增刪除)
+    let budgetList = JSON.parse(localStorage.getItem('osaka_budget_list')) || [
+      { id: 1, name: "機票 (台灣虎航)", cost: 13000 },
+      { id: 2, name: "住宿 (大阪龍仕柏 4 晚)", cost: 8000 },
+      { id: 3, name: "預換日幣現金", cost: 5000 },
+      { id: 4, name: "eSIM 上網卡", cost: 300 },
+      { id: 5, name: "機場接送 + 機捷", cost: 500 },
+      { id: 6, name: "旅遊平安險", cost: 300 },
+      { id: 7, name: "票券、行程套票", cost: 6684 }
     ];
 
     function renderBudget() {
       const container = document.getElementById('budget-items');
+      container.innerHTML = '';
       let total = 0;
 
-      budgetData.forEach(item => {
-        total += item.cost;
+      budgetList.forEach(item => {
+        const itemCost = Number(item.cost) || 0;
+        total += itemCost;
+
         container.insertAdjacentHTML('beforeend', `
           <div class="flex justify-between items-center p-2.5 rounded-xl bg-sand/40 border border-ink/20">
+            <span contenteditable="true" class="font-bold">${item.name}</span>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] bg-paper border border-ink px-1.5 py-0.5 rounded" contenteditable="true">${item.cat}</span>
-              <span contenteditable="true">${item.name}</span>
+              <span class="font-black text-coral">NT$ ${itemCost.toLocaleString()}</span>
+              <button onclick="deleteBudgetItem(${item.id})" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs no-print">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
-            <span class="font-black" contenteditable="true">NT$ ${item.cost.toLocaleString()}</span>
           </div>
         `);
       });
 
+      // 自動加計更新總額
       document.getElementById('total-cost').innerText = `NT$ ${total.toLocaleString()}`;
     }
 
-    // 5. 分帳記帳功能 (含每日總額與類別)
+    function addBudgetItem() {
+      const nameInput = document.getElementById('bud-name');
+      const costInput = document.getElementById('bud-cost');
+      const name = nameInput.value.trim();
+      const cost = parseFloat(costInput.value);
+
+      if (!name || isNaN(cost) || cost < 0) {
+        alert('請輸入正確的項目名稱與金額！');
+        return;
+      }
+
+      budgetList.push({
+        id: Date.now(),
+        name: name,
+        cost: cost
+      });
+
+      localStorage.setItem('osaka_budget_list', JSON.stringify(budgetList));
+      nameInput.value = '';
+      costInput.value = '';
+      renderBudget();
+    }
+
+    function deleteBudgetItem(id) {
+      budgetList = budgetList.filter(item => item.id !== id);
+      localStorage.setItem('osaka_budget_list', JSON.stringify(budgetList));
+      renderBudget();
+    }
+
+    // 5. 分帳與記帳功能
     let expenses = JSON.parse(localStorage.getItem('osaka_expenses')) || [
       { id: 1, date: "Day 1 (1/13)", cat: "🍜 餐飲美食", name: "鴨と葱拉麵", amount: 1200 },
       { id: 2, date: "Day 1 (1/13)", cat: "🍜 餐飲美食", name: "燒肉但馬屋", amount: 8500 },
@@ -831,7 +972,7 @@
             </div>
             <div class="flex items-center gap-2">
               <span class="font-black text-coral text-sm">$${Number(item.amount).toLocaleString()}</span>
-              <button onclick="deleteExpense(${item.id})" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs">
+              <button onclick="deleteExpense(${item.id})" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs no-print">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -839,7 +980,6 @@
         `);
       });
 
-      // 渲染每日花費總額
       Object.keys(dailySum).forEach((dayKey) => {
         dailyTotalsContainer.insertAdjacentHTML('beforeend', `
           <div class="bg-paper p-2 rounded-xl border border-ink/30 flex justify-between items-center">
@@ -863,14 +1003,7 @@
         return;
       }
 
-      expenses.push({
-        id: Date.now(),
-        date,
-        cat,
-        name,
-        amount
-      });
-
+      expenses.push({ id: Date.now(), date, cat, name, amount });
       localStorage.setItem('osaka_expenses', JSON.stringify(expenses));
       document.getElementById('exp-name').value = '';
       document.getElementById('exp-amount').value = '';
@@ -893,7 +1026,6 @@
     function renderShopping() {
       const container = document.getElementById('shopping-list');
       container.innerHTML = '';
-
       let checkedCount = 0;
 
       shoppingList.forEach((item) => {
@@ -905,7 +1037,7 @@
               <input type="checkbox" class="custom-checkbox" onchange="toggleShopping(${item.id})" ${item.checked ? 'checked' : ''}>
               <span class="${item.checked ? 'line-through opacity-50' : ''}" contenteditable="true">${item.name}</span>
             </label>
-            <button onclick="deleteShopping(${item.id})" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs ml-2">
+            <button onclick="deleteShopping(${item.id})" class="text-ink/40 hover:text-coral p-1 cursor-pointer text-xs ml-2 no-print">
               <i class="fa-solid fa-xmark text-sm"></i>
             </button>
           </div>
@@ -920,12 +1052,7 @@
       const val = input.value.trim();
       if (!val) return;
 
-      shoppingList.push({
-        id: Date.now(),
-        name: val,
-        checked: false
-      });
-
+      shoppingList.push({ id: Date.now(), name: val, checked: false });
       localStorage.setItem('osaka_shopping', JSON.stringify(shoppingList));
       input.value = '';
       renderShopping();
@@ -943,7 +1070,7 @@
       renderShopping();
     }
 
-    // 初始化頁面
+    // 頁面初始化
     window.onload = function() {
       switchDay(1);
       renderPackingList();
