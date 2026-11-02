@@ -145,6 +145,12 @@
       }
       .pb-border, .pb-border-sm {
         box-shadow: none !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      #timeline-container > div {
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
     }
 
@@ -172,14 +178,40 @@
         <span class="bg-coral text-white p-1 px-2 rounded-xl border-2 border-ink text-xs">2027</span>
         <span contenteditable="true">大阪旅行</span>
       </a>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleSyncModal()" class="text-xs font-black bg-wakatake text-ink px-2 py-1 rounded-full border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-cloud"></i> 同步
+        </button>
         <button onclick="exportToPDF()" class="text-xs font-black bg-coral text-white px-2.5 py-1 rounded-full border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 flex items-center gap-1 cursor-pointer">
           <i class="fa-solid fa-file-pdf"></i> PDF
         </button>
-        <span class="text-[10px] font-bold bg-yamabuki px-2 py-1 rounded-full border-2 border-ink"><i class="fa-solid fa-pen mr-0.5"></i>可編輯</span>
       </div>
     </div>
   </nav>
+
+  <!-- 雲端多人同步彈窗 -->
+  <div id="sync-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+    <div class="bg-paper p-5 pb-border shadow-picture-book w-full max-w-sm space-y-3">
+      <h3 class="font-black text-base text-ink flex items-center gap-2">
+        <i class="fa-solid fa-users text-coral"></i> 同行夥伴多人同步
+      </h3>
+      <p class="text-xs text-ink/70 font-bold">請輸入相符的「房間暗號」，同行的朋友就能同時查看與編輯記帳、行李及採購清單！</p>
+      
+      <div>
+        <label class="block text-xs font-black text-ink/70 mb-1">連線房間號</label>
+        <input type="text" id="sync-room-input" placeholder="例如: osaka-2027" class="w-full p-2 text-xs font-bold bg-sand rounded-xl border-2 border-ink outline-none">
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="saveSyncSettings()" class="flex-1 py-2 bg-coral text-white font-black text-xs rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5">
+          開啟/套用同步
+        </button>
+        <button onclick="toggleSyncModal()" class="px-4 py-2 bg-sand text-ink font-black text-xs rounded-xl border-2 border-ink shadow-picture-book-sm">
+          關閉
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 主容器 (手機優先 max-w-md) -->
   <main class="max-w-md mx-auto pt-20 px-4 space-y-8">
@@ -369,15 +401,15 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-4 h-8 bg-coral rounded-full border-2 border-ink"></span>
-          <h2 class="text-xl font-black text-ink">旅程記帳</h2>
+          <h2 class="text-xl font-black text-ink">旅程分帳記帳</h2>
         </div>
-        <span class="text-xs font-black bg-sand px-2.5 py-1 rounded-full border-2 border-ink">即時統計</span>
+        <span class="text-xs font-black bg-sand px-2.5 py-1 rounded-full border-2 border-ink">多人結算</span>
       </div>
 
       <!-- 記帳表單 -->
       <div class="bg-paper p-5 pb-border shadow-picture-book space-y-3 no-print">
         <h3 class="font-black text-sm text-ink flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-coral"></i> 新增消費紀錄
+          <i class="fa-solid fa-pen-to-square text-coral"></i> 新增消費與付款人
         </h3>
         
         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
@@ -390,6 +422,11 @@
               <option value="Day 4 (1/16)">Day 4 (1/16)</option>
               <option value="Day 5 (1/17)">Day 5 (1/17)</option>
             </select>
+          </div>
+
+          <div>
+            <label class="block text-ink/70 mb-1">付款人</label>
+            <input type="text" id="exp-payer" placeholder="例：小康 / 共同公費" class="w-full p-2 bg-sand rounded-xl border-2 border-ink outline-none">
           </div>
 
           <div>
@@ -408,15 +445,25 @@
             <input type="text" id="exp-name" placeholder="例：鴨與蔥拉麵" class="w-full p-2 bg-sand rounded-xl border-2 border-ink outline-none">
           </div>
 
-          <div>
+          <div class="col-span-2">
             <label class="block text-ink/70 mb-1">金額 (JPY/NTD)</label>
             <input type="number" id="exp-amount" placeholder="1000" class="w-full p-2 bg-sand rounded-xl border-2 border-ink outline-none">
           </div>
         </div>
 
         <button onclick="addExpense()" class="w-full py-2.5 bg-yamabuki font-black text-sm text-ink rounded-xl border-2 border-ink shadow-picture-book-sm active:translate-y-0.5 cursor-pointer mt-2">
-          ＋ 新增這筆花費
+          ＋ 新增這筆付款紀錄
         </button>
+      </div>
+
+      <!-- 付款人結算統計 -->
+      <div class="bg-paper p-4 pb-border-sm shadow-picture-book-sm space-y-2">
+        <h3 class="font-black text-xs text-ink/80 flex items-center justify-between border-b border-ink/20 pb-1">
+          <span>👥 各付款人實付總額 (分帳參考)</span>
+        </h3>
+        <div id="payer-expense-totals" class="grid grid-cols-2 gap-2 text-xs font-black">
+          <!-- JS 渲染 -->
+        </div>
       </div>
 
       <!-- 每日花費總額統計 -->
@@ -552,6 +599,7 @@
         <div class="space-y-2 text-xs font-bold" id="budget-items">
           <!-- JS 渲染 -->
         </div>
+      </div>
     </section>
 
   </main>
@@ -607,6 +655,11 @@
     const targetDate = new Date('2027-01-13T07:00:00').getTime();
 
     function updateCountdown() {
+      const daysEl = document.getElementById('cd-days');
+      const hoursEl = document.getElementById('cd-hours');
+      const minsEl = document.getElementById('cd-mins');
+      if (!daysEl || !hoursEl || !minsEl) return;
+
       const now = new Date().getTime();
       const diff = targetDate - now;
 
@@ -615,17 +668,15 @@
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-        document.getElementById('cd-days').innerText = days;
-        document.getElementById('cd-hours').innerText = hours.toString().padStart(2, '0');
-        document.getElementById('cd-mins').innerText = mins.toString().padStart(2, '0');
+        daysEl.innerText = days;
+        hoursEl.innerText = hours.toString().padStart(2, '0');
+        minsEl.innerText = mins.toString().padStart(2, '0');
       } else {
-        document.getElementById('cd-days').innerText = '0';
-        document.getElementById('cd-hours').innerText = '00';
-        document.getElementById('cd-mins').innerText = '00';
+        daysEl.innerText = '0';
+        hoursEl.innerText = '00';
+        minsEl.innerText = '00';
       }
     }
-    updateCountdown();
-    setInterval(updateCountdown, 60000);
 
     // 2. 每日行程資料集
     const itineraryData = {
@@ -703,12 +754,23 @@
       if(activeTab) activeTab.classList.add('active');
 
       const data = itineraryData[dayNum];
-      document.getElementById('day-date-badge').innerText = data.date;
-      document.getElementById('day-title').innerText = data.title;
-      document.getElementById('day-svg').innerText = data.icon;
-      document.getElementById('day-header').className = `${data.badgeColor} p-4 pb-border shadow-picture-book flex items-center justify-between transition-all`;
+      if (!data) return;
+
+      // 確保從「展開全部日」狀態切換回來時，day-header 恢復原本的雙欄結構與元素
+      const dayHeaderContainer = document.getElementById('day-header');
+      dayHeaderContainer.className = `${data.badgeColor} p-4 pb-border shadow-picture-book flex items-center justify-between transition-all`;
+      dayHeaderContainer.innerHTML = `
+        <div>
+          <span id="day-date-badge" class="text-xs font-black bg-paper px-2 py-0.5 rounded-md border border-ink" contenteditable="true">${data.date}</span>
+          <h3 id="day-title" class="text-lg font-black text-ink mt-1" contenteditable="true">${data.title}</h3>
+        </div>
+        <div id="day-svg" class="w-12 h-12 flex items-center justify-center text-2xl">
+          ${data.icon}
+        </div>
+      `;
 
       const container = document.getElementById('timeline-container');
+      container.className = "space-y-4 relative pl-4 border-l-4 border-dashed border-ink/40 ml-2";
       container.innerHTML = '';
 
       data.events.forEach((item, index) => {
@@ -748,8 +810,9 @@
     function renderAllDaysForPDF() {
       const container = document.getElementById('timeline-container');
       container.innerHTML = '';
-      document.getElementById('day-header').className = "bg-yamabuki p-4 pb-border shadow-picture-book text-center";
-      document.getElementById('day-header').innerHTML = `<h3 class="text-lg font-black text-ink">🗓️ 大阪 5 天 4 夜完整行程表</h3>`;
+      const headerContainer = document.getElementById('day-header');
+      headerContainer.className = "bg-yamabuki p-4 pb-border shadow-picture-book text-center";
+      headerContainer.innerHTML = `<h3 class="text-lg font-black text-ink">🗓️ 大阪 5 天 4 夜完整行程表</h3>`;
 
       Object.keys(itineraryData).forEach((dayNum) => {
         const data = itineraryData[dayNum];
@@ -797,6 +860,7 @@
     function renderPackingList() {
       const carryContainer = document.getElementById('carryon-list');
       const checkedContainer = document.getElementById('checked-list');
+      if (!carryContainer || !checkedContainer) return;
       
       carryContainer.innerHTML = '';
       checkedContainer.innerHTML = '';
@@ -834,12 +898,14 @@
         `);
       });
 
-      document.getElementById('packing-progress').innerText = `${checkedCount}/${totalCount} 完成`;
+      const packProgressEl = document.getElementById('packing-progress');
+      if (packProgressEl) packProgressEl.innerText = `${checkedCount}/${totalCount} 完成`;
     }
 
     function addPackingItem(type) {
       const inputId = type === 'carry' ? 'carry-input' : 'checked-input';
       const input = document.getElementById(inputId);
+      if (!input) return;
       const text = input.value.trim();
       if (!text) return;
 
@@ -879,6 +945,7 @@
 
     function renderBudget() {
       const container = document.getElementById('budget-items');
+      if (!container) return;
       container.innerHTML = '';
       let total = 0;
 
@@ -899,13 +966,14 @@
         `);
       });
 
-      // 自動加計更新總額
-      document.getElementById('total-cost').innerText = `NT$ ${total.toLocaleString()}`;
+      const totalCostEl = document.getElementById('total-cost');
+      if (totalCostEl) totalCostEl.innerText = `NT$ ${total.toLocaleString()}`;
     }
 
     function addBudgetItem() {
       const nameInput = document.getElementById('bud-name');
       const costInput = document.getElementById('bud-cost');
+      if (!nameInput || !costInput) return;
       const name = nameInput.value.trim();
       const cost = parseFloat(costInput.value);
 
@@ -934,16 +1002,18 @@
 
     // 5. 分帳與記帳功能
     let expenses = JSON.parse(localStorage.getItem('osaka_expenses')) || [
-      { id: 1, date: "Day 1 (1/13)", cat: "🍜 餐飲美食", name: "鴨と葱拉麵", amount: 1200 },
-      { id: 2, date: "Day 1 (1/13)", cat: "🍜 餐飲美食", name: "燒肉但馬屋", amount: 8500 },
-      { id: 3, date: "Day 2 (1/14)", cat: "🎟️ 景點門票", name: "USJ 快速通關", amount: 15000 }
-    ];
+      { id: 1, date: "Day 1 (1/13)", payer: "小康", cat: "🍜 餐飲美食", name: "鴨與蔥拉麵", amount: 1200 },
+          ];
 
     function renderExpenses() {
       const listContainer = document.getElementById('expense-list');
       const dailyTotalsContainer = document.getElementById('daily-expense-totals');
+      const payerTotalsContainer = document.getElementById('payer-expense-totals');
+      if (!listContainer || !dailyTotalsContainer || !payerTotalsContainer) return;
+
       listContainer.innerHTML = '';
       dailyTotalsContainer.innerHTML = '';
+      payerTotalsContainer.innerHTML = '';
 
       let dailySum = {
         "Day 1 (1/13)": 0,
@@ -953,6 +1023,7 @@
         "Day 5 (1/17)": 0
       };
 
+      let payerSum = {};
       let grandTotal = 0;
 
       expenses.forEach((item) => {
@@ -961,11 +1032,15 @@
           dailySum[item.date] += Number(item.amount);
         }
 
+        const payer = item.payer || "未指定";
+        payerSum[payer] = (payerSum[payer] || 0) + Number(item.amount);
+
         listContainer.insertAdjacentHTML('beforeend', `
           <div class="flex items-center justify-between p-2.5 bg-sand/40 rounded-xl border border-ink/20">
             <div>
               <div class="flex items-center gap-1.5 text-[10px] text-ink/60 mb-0.5">
                 <span class="bg-paper px-1.5 py-0.2 rounded border border-ink/30">${item.date}</span>
+                <span class="bg-yamabuki px-1.5 py-0.2 rounded border border-ink/30">付款: ${payer}</span>
                 <span>${item.cat}</span>
               </div>
               <p class="font-black text-sm text-ink">${item.name}</p>
@@ -980,6 +1055,17 @@
         `);
       });
 
+      // 渲染各付款人實付總額
+      Object.keys(payerSum).forEach((payerKey) => {
+        payerTotalsContainer.insertAdjacentHTML('beforeend', `
+          <div class="bg-sand p-2 rounded-xl border border-ink/30 flex justify-between items-center">
+            <span class="text-ink/70">${payerKey}</span>
+            <span class="text-coral">$${payerSum[payerKey].toLocaleString()}</span>
+          </div>
+        `);
+      });
+
+      // 渲染每日花費總額
       Object.keys(dailySum).forEach((dayKey) => {
         dailyTotalsContainer.insertAdjacentHTML('beforeend', `
           <div class="bg-paper p-2 rounded-xl border border-ink/30 flex justify-between items-center">
@@ -989,11 +1075,13 @@
         `);
       });
 
-      document.getElementById('exp-grand-total').innerText = `總計: $${grandTotal.toLocaleString()}`;
+      const expGrandTotalEl = document.getElementById('exp-grand-total');
+      if (expGrandTotalEl) expGrandTotalEl.innerText = `總計: $${grandTotal.toLocaleString()}`;
     }
 
     function addExpense() {
       const date = document.getElementById('exp-date').value;
+      const payer = document.getElementById('exp-payer').value.trim() || "公費/未指定";
       const cat = document.getElementById('exp-cat').value;
       const name = document.getElementById('exp-name').value.trim();
       const amount = parseFloat(document.getElementById('exp-amount').value);
@@ -1003,9 +1091,10 @@
         return;
       }
 
-      expenses.push({ id: Date.now(), date, cat, name, amount });
+      expenses.push({ id: Date.now(), date, payer, cat, name, amount });
       localStorage.setItem('osaka_expenses', JSON.stringify(expenses));
       document.getElementById('exp-name').value = '';
+      document.getElementById('exp-payer').value = '';
       document.getElementById('exp-amount').value = '';
       renderExpenses();
     }
@@ -1025,6 +1114,7 @@
 
     function renderShopping() {
       const container = document.getElementById('shopping-list');
+      if (!container) return;
       container.innerHTML = '';
       let checkedCount = 0;
 
@@ -1044,11 +1134,13 @@
         `);
       });
 
-      document.getElementById('shop-progress').innerText = `${checkedCount}/${shoppingList.length} 完成`;
+      const shopProgressEl = document.getElementById('shop-progress');
+      if (shopProgressEl) shopProgressEl.innerText = `${checkedCount}/${shoppingList.length} 完成`;
     }
 
     function addShoppingItem() {
       const input = document.getElementById('shop-input');
+      if (!input) return;
       const val = input.value.trim();
       if (!val) return;
 
@@ -1070,13 +1162,40 @@
       renderShopping();
     }
 
-    // 頁面初始化
+    // 7. 多人同步彈窗控制
+    function toggleSyncModal() {
+      const modal = document.getElementById('sync-modal');
+      if (modal) {
+        modal.classList.toggle('hidden');
+      }
+    }
+
+    function saveSyncSettings() {
+      const roomInput = document.getElementById('sync-room-input');
+      if (roomInput && roomInput.value.trim()) {
+        localStorage.setItem('osaka_sync_room', roomInput.value.trim());
+        alert('已成功儲存同步房間：' + roomInput.value.trim() + '！');
+        toggleSyncModal();
+      } else {
+        alert('請輸入有效的房間號碼！');
+      }
+    }
+
+    // 頁面載入初始化
     window.onload = function() {
       switchDay(1);
       renderPackingList();
       renderBudget();
       renderExpenses();
       renderShopping();
+      updateCountdown();
+      setInterval(updateCountdown, 60000);
+
+      const savedRoom = localStorage.getItem('osaka_sync_room');
+      if (savedRoom) {
+        const roomInput = document.getElementById('sync-room-input');
+        if (roomInput) roomInput.value = savedRoom;
+      }
     };
   </script>
 </body>
